@@ -10,14 +10,16 @@ export const store = new Vuex.Store({
     token: localStorage.getItem('token') || '',
     status: '',
     userid: localStorage.getItem('userid') || '',
-    fetchUsers: []
+    addUsers: '',
+    users: []
   },
   getters: {
     isLoggedIn: state => !!state.token,
     authStatus: state => state.status,
     token: state => state.token,
     userid: state => state.userid,
-    userlist: state => state.fetchUsers
+    users: state => state.users,
+    addUsers: state => state.addUsers
   },
   mutations: {
     auth_request (state) {
@@ -35,8 +37,14 @@ export const store = new Vuex.Store({
       state.status = ''
       state.token = ''
     },
-    FETCH_USERS (state, data) {
-      state.fetchUsers = data.response
+    addRequest (state, user) {
+      state.status = 'loading'
+    },
+    addUsers (state, status) {
+      state.addUsers = 'success'
+    },
+    fetchUsers (state, users) {
+      state.users = users
     }
   },
   actions: {
@@ -62,7 +70,7 @@ export const store = new Vuex.Store({
             resolve(resp)
           })
           .catch(err => {
-            commit('auth_error')
+            commit('auth_error', err)
             localStorage.removeItem('token')
             localStorage.removeItem('userid')
             reject(err)
@@ -77,22 +85,45 @@ export const store = new Vuex.Store({
         resolve()
       })
     },
-    fetchUsers ({commit}, user) {
+    fetchUsers ({ commit }) {
       return new Promise((resolve, reject) => {
         commit('auth_request')
+        const token = this.getters.token
         axios({
           url: 'http://10.195.37.114:8000/api/users',
-          params: { role: 'Student' },
+          params: {role: 'Student'},
           method: 'GET',
           headers: {
-            Authorization: 'Token ' + user
+            Authorization: 'Token ' + token
+          }
+        })
+          .then((response) => {
+            commit('fetchUsers', response)
+            resolve(response)
+          })
+          .catch(err => {
+            commit('auth_error', err)
+            reject(err)
+          })
+      })
+    },
+    addStudentStore ({commit}, user) {
+      return new Promise((resolve, reject) => {
+        commit('addRequest', user)
+        axios({url: 'http://10.195.37.114:8000/api/users',
+          data: user,
+          method: 'POST',
+          headers: {
+            Authorization: 'Token ' + user.token
           }
         })
           .then(resp => {
-            commit('FETCH_USERS', { 'response': resp.data })
+            const status = resp.status
+            commit('addUsers', { 'status': status })
             resolve(resp)
           })
           .catch(err => {
+            commit('auth_error', err)
             reject(err)
           })
       })

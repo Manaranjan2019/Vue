@@ -29,7 +29,7 @@
               <v-icon>{{ child.icon }}</v-icon>
             </v-list-tile-action>
             <v-list-tile-content>
-              <router-link :click="child.userLogout" :to="child.href">
+              <router-link :to="child.href">
                 <v-list-tile-title>
                   {{ child.text }}
                 </v-list-tile-title>
@@ -87,7 +87,7 @@
                        :keyN="J"
             v-bind:key="childText.text"
           >
-            <router-link :click="childText.userLogout" :to="childText.href" >
+            <router-link :to="childText.href" >
               <v-list-tile-title>
                 {{ childText.text }}
               </v-list-tile-title>
@@ -177,7 +177,7 @@ export default {
         model: false,
         children: [
           { icon: 'lock', text: 'Change Password', href: 'changePassword' },
-          { icon: 'close', text: 'Logout', href: '/admin', userLogout: 'logout()' }
+          { icon: 'close', text: 'Logout', href: '/admin' }
         ]
       }
     ]
@@ -192,13 +192,7 @@ export default {
     userid: function () { return this.$store.getters.userid }
   },
   methods: {
-    logout: function () {
-      alert('Logout')
-      this.$store.dispatch('logout')
-        .then(() => {
-          this.$router.push('/admin')
-        })
-    }
+
   },
   created () {
     const isLoggedIn = this.$store.getters.isLoggedIn

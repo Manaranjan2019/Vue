@@ -26,7 +26,7 @@
                   :error-messages="errors.collect('role')"
                   label="Select Role"
                   data-vv-name="role"
-                  required
+                  requiredlogin
                 ></v-select>
                 <v-text-field
                   v-model="username"
@@ -70,7 +70,7 @@
                   data-vv-name="password"
                   required
                 ></v-text-field>
-                <v-btn @click="submit">submit</v-btn>
+                <v-btn @click="addStudent">submit</v-btn>
                 <v-btn @click="clear">clear</v-btn>
               </form>
             </v-flex>
@@ -93,6 +93,7 @@ export default {
       'Parent',
       'Admin'
     ],
+    msg: '',
     username: '',
     first_name: '',
     last_name: '',
@@ -105,7 +106,7 @@ export default {
       },
       custom: {
         role: {
-          required: 'Select field is required'
+          required: () => 'Select field is required'
         },
         username: {
           required: () => 'User Name can not be empty'
@@ -131,11 +132,26 @@ export default {
     this.$validator.localize('en', this.dictionary)
   },
   methods: {
-    submit () {
+    addStudent: function () {
       this.$validator.validateAll()
+      const token = this.$store.getters.token
+      let data = {
+        role: this.role,
+        username: this.username,
+        first_name: this.first_name,
+        last_name: this.last_name,
+        email: this.email,
+        password: this.password,
+        token: token
+      }
+      this.$store.dispatch('addStudentStore', data)
+        .then(() => this.$router.push('/studentList'))
+        .catch(err => {
+          this.msg = err.response.data.username
+        })
     },
     clear () {
-      this.role = null,
+      this.role = ''
       this.username = ''
       this.first_name = ''
       this.last_name = ''

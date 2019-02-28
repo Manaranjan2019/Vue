@@ -6,7 +6,7 @@
         <v-container
           grid-list-md text-xs-center
         >
-          <v-flex row xs12>
+          <v-flex row xs11>
             <div class="font-weight-thin my-2 display-1 text-lg-left" id="s2">
               Student List
             </div>
@@ -33,6 +33,36 @@
                 <v-divider class=""></v-divider>
               </div>
             </v-flex>
+            <v-dialog v-model="dialog" max-width="700px">
+              <v-card>
+                <v-card-title>
+                  <span class="headline">{{ username }} </span>
+                </v-card-title>
+                <v-card-text>
+                  <v-container grid-list-md>
+                    <v-layout wrap>
+                      <v-flex xs12 sm6 md6>
+                        <v-text-field v-model="editedItem.first_name" label="First Name"></v-text-field>
+                      </v-flex>
+                      <v-flex xs12 sm6 md6>
+                        <v-text-field v-model="editedItem.last_name" label="Last Name"></v-text-field>
+                      </v-flex>
+                      <v-flex xs12 sm6 md6>
+                        <v-text-field v-model="editedItem.username" label="User Name"></v-text-field>
+                      </v-flex>
+                      <v-flex xs12 sm6 md6>
+                        <v-text-field v-model="editedItem.email" label="Email Address"></v-text-field>
+                      </v-flex>
+                    </v-layout>
+                  </v-container>
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="blue darken-1" flat @click="close">Cancel</v-btn>
+                  <v-btn color="blue darken-1" flat @click="save">Save</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
             <v-flex xs11 pl-3>
               <div>
                 <v-toolbar flat color="white">
@@ -75,7 +105,7 @@
                       </v-icon>
                       <v-icon
                         small
-                        @click="deleteItem(props.item)"
+                        @click="deleteItem(props.item, props.item.id)"
                       >
                         delete
                       </v-icon>
@@ -114,6 +144,12 @@ export default {
       { text: 'Actions', value: 'name', align: 'left', sortable: false }
     ],
     desserts: [],
+    editedItem: {
+      id: '',
+      username: 0,
+      name: 0,
+      email: 0
+    },
     defaultItem: {
       id: '',
       username: 0,
@@ -121,17 +157,50 @@ export default {
       email: 0
     }
   }),
+  computed: {
+    username () {
+      return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+    }
+  },
+  watch: {
+    dialog (val) {
+      val || this.close()
+    }
+  },
   created () {
-    this.fetchAllUser()
-    this.initialize_User()
+    this.list()
   },
   methods: {
-    fetchAllUser () {
-      const token = this.$store.getters.token
-      this.$store.dispatch('fetchUsers', token)
+    list () {
+      this.$store.dispatch('fetchUsers')
+        .then((response) => {
+          this.desserts = this.$store.getters.users.data
+        })
     },
-    initialize_User: function() {
-      this.desserts = this.$store.getters.userlist
+    editItem (item) {
+      this.editedIndex = this.desserts.indexOf(item)
+      this.editedItem = Object.assign({}, item)
+      this.dialog = true
+    },
+    deleteItem (item, id) {
+      const index = this.desserts.indexOf(item)
+      confirm('Are you sure you want to delete this item?') && this.desserts.splice(index, 1)
+    },
+    close () {
+      this.dialog = false
+      setTimeout(() => {
+        this.editedItem = Object.assign({}, this.defaultItem)
+        this.editedIndex = -1
+      }, 300)
+    },
+    save () {
+      alert(this.editedIndex,id)
+      if (this.editedIndex > -1) {
+        Object.assign(this.desserts[this.editedIndex], this.editedItem)
+      } else {
+        this.desserts.push(this.editedItem)
+      }
+      this.close()
     }
   }
 }
