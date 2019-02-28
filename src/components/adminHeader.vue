@@ -29,7 +29,7 @@
               <v-icon>{{ child.icon }}</v-icon>
             </v-list-tile-action>
             <v-list-tile-content>
-              <router-link :click="child.evt" :to="child.href">
+              <router-link :to="child.href">
                 <v-list-tile-title>
                   {{ child.text }}
                 </v-list-tile-title>
@@ -65,22 +65,33 @@
     </v-toolbar-title>
     <v-spacer></v-spacer>
     <v-toolbar-items class="hidden-sm-and-down">
-      <v-menu offset-y v-for="itemT in items">
+      <v-menu offset-y
+              v-for="itemMenu in items"
+              v-bind:key="itemMenu.text"
+      >
         <v-btn
           slot="activator"
           color="blue darken-3"
           dark
         >
-          {{ itemT.text }}
+          <v-list-tile-title v-if ="itemMenu.children">
+            {{ itemMenu.text }}
+          </v-list-tile-title>
+          <router-link v-else :to="itemMenu.href" class="txtwt">
+            {{ itemMenu.text }}
+          </router-link>
         </v-btn>
-        <v-list>
+        <v-list v-if="itemMenu.children">
           <v-list-tile
-            v-for="(childN, J) in itemT.children"
-            :keyN="J"
+            v-for="(childText, J) in itemMenu.children"
+                       :keyN="J"
+            v-bind:key="childText.text"
           >
+            <router-link :to="childText.href" >
               <v-list-tile-title>
-                {{ childN.text }}
+                {{ childText.text }}
               </v-list-tile-title>
+            </router-link>
           </v-list-tile>
         </v-list>
       </v-menu>
@@ -103,11 +114,31 @@ export default {
       {
         icon: 'keyboard_arrow_up',
         'icon-alt': 'keyboard_arrow_down',
-        text: 'User',
+        text: 'Student',
         model: false,
         children: [
-          { icon: 'edit', text: 'Add New User', href: 'addUser' },
-          { icon: 'list', text: 'User List', href: 'userList' }
+          { icon: 'edit', text: 'Add New Student', href: 'addStudent' },
+          { icon: 'list', text: 'Student List', href: 'studentList' }
+        ]
+      },
+      {
+        icon: 'keyboard_arrow_up',
+        'icon-alt': 'keyboard_arrow_down',
+        text: 'Teacher',
+        model: false,
+        children: [
+          { icon: 'edit', text: 'Add New Teacher', href: 'addTeacher' },
+          { icon: 'list', text: 'Teacher List', href: 'teacherList' }
+        ]
+      },
+      {
+        icon: 'keyboard_arrow_up',
+        'icon-alt': 'keyboard_arrow_down',
+        text: 'Parent',
+        model: false,
+        children: [
+          { icon: 'edit', text: 'Add New Parent', href: 'addParent' },
+          { icon: 'list', text: 'Parent List', href: 'parentList' }
         ]
       },
       {
@@ -146,13 +177,28 @@ export default {
         model: false,
         children: [
           { icon: 'lock', text: 'Change Password', href: 'changePassword' },
-          { icon: 'close', text: 'Logout', href: '', evt: 'logout' }
+          { icon: 'close', text: 'Logout', href: '/admin' }
         ]
       }
     ]
   }),
   props: {
     source: String
+  },
+  computed: {
+    isLoggedIn: function () { return this.$store.getters.isLoggedIn },
+    authStatus: function () { return this.$store.getters.authStatus },
+    token: function () { return this.$store.getters.token },
+    userid: function () { return this.$store.getters.userid }
+  },
+  methods: {
+
+  },
+  created () {
+    const isLoggedIn = this.$store.getters.isLoggedIn
+    if (isLoggedIn === false) {
+      this.$router.push('/admin')
+    }
   }
 }
 </script>
@@ -164,5 +210,11 @@ export default {
   a:hover{
     text-decoration: underline;
     color: #000;
+  }
+  .txtwt {
+    color: #fff;
+  }
+  .router-link-active {
+    color: darkorange;
   }
 </style>

@@ -61,6 +61,9 @@ export default {
       submited: false
     }
   },
+  created () {
+    this.logout()
+  },
   methods: {
     login: function () {
       const { username, password } = this
@@ -72,6 +75,12 @@ export default {
         .catch(err => {
           this.submited = true
           console.log(err)
+        })
+    },
+    logout: function () {
+      this.$store.dispatch('logout')
+        .then(() => {
+          this.$router.push('/admin')
         })
     }
   }

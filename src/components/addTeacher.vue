@@ -1,5 +1,5 @@
 <template>
-  <div id="addUser">
+  <div id="addTeacher">
     <v-app id="inspire">
       <adminHeader></adminHeader>
       <v-content>
@@ -8,7 +8,7 @@
         >
           <v-flex xs11>
             <div class="font-weight-thin my-2 display-1 text-lg-left" id="s2">
-              Add New User
+              Add New Teacher
             </div>
           </v-flex>
           <v-layout row wrap>
@@ -65,7 +65,7 @@
 <script>
 import adminHeader from './adminHeader'
 export default {
-  name: 'addUser',
+  name: 'addTeacher',
   components: { adminHeader },
   data: () => ({
     first_name: '',
