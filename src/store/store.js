@@ -24,6 +24,7 @@ export const store = new Vuex.Store({
   mutations: {
     auth_request (state) {
       state.status = 'loading'
+      //asdhasdsaj dsajkhdsa dlkjh
     },
     auth_success (state, data) {
       state.status = 'success'
