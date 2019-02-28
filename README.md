@@ -1,6 +1,6 @@
 # school
 
-> A Vue.js project
+> A Vue.js project setup
 
 ## Build Setup
 
